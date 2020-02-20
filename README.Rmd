@@ -11,6 +11,53 @@ source('spotify.R')
 get_playlist_audio_features('spotify', '37i9dQZEVXcMtOyc7YD1pC')
 ```
 
+```{r}
+spotify_features <- tribble(
+    ~type, ~subtype, ~user, ~playlist,
+    'Discover weekly', 'Varied', 'spotify', '37i9dQZEVXcMtOyc7YD1pC',
+    'Pauline', 'Oldies', '1113203344', '6aSWHR10hKTYP3jYfbJiK2',
+    'Lydia 2019', 'Varied', 'spotify', '37i9dQZF1EtkiLBFgtrmPK',
+    'Folksy', 'Country', 'the_halfblood_princess', '3vsgMMWPMBWq68WhsSf48T'
+) %>% 
+  mutate(features = map2(user, playlist, get_playlist_audio_features)) %>% 
+  select(type, subtype, features) %>% 
+   unnest(features)
+spotify_features
+```
+
+```{r}
+spotify_features %>%
+  ## Try different features and different summary functions.
+  summarise(M = mean(danceability, SD = sd(danceability)))
+```
+```{r}
+spotify_features%>%
+  group_by(type, subtype)%>%
+  summarise(M = mean(danceability, SD = sd(danceability)))
+```
+
+```{r}
+spotify_features%>%
+  ggplot(aes(x=loudness)) + geom_histogram(binwidth = 5)
+```
+```{r}
+spotify_features%>%
+  group_by(type)%>%
+  ggplot(aes(x = type, y = energy, fill = subtype)) + geom_violin()
+```
+```{r}
+spotify_features %>% 
+  ggplot(aes(x = valence, y = speechiness)) + 
+  facet_wrap(~ type) +
+  stat_density_2d(
+    geom = 'raster', 
+    aes(fill = stat(density)), 
+    contour = FALSE
+  ) + 
+  geom_jitter(colour = 'white', alpha = 0.5) + 
+  coord_equal()
+```
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
