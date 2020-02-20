@@ -1,8 +1,6 @@
 ---
 title: "Everyday Music Listening"
-author: "Lydia Tian"
-date: "20/02/2020"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
